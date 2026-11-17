@@ -1,0 +1,24 @@
+{
+  "today": "115/11/17",
+  "ticket": {
+    "ticket_no": "XE0000005",
+    "plate": "EFG-9753",
+    "vehicle_type": "機車",
+    "violation_time": "115/10/30 21:10",
+    "violation_place": "示範市大學路",
+    "violation_fact": "行駛人行道",
+    "article": "道路交通管理處罰條例第45條第1項第6款",
+    "fine": 600,
+    "source": "逕行舉發",
+    "agency": "示範市政府警察局示範分局",
+    "punish_agency": "示範市監理站",
+    "received_date": "115/11/08",
+    "due_date": "115/12/08"
+  },
+  "statement": "那天晚上機車借給同學騎去夜市，不是我騎的，我那時候在宿舍。",
+  "evidence": [
+    {
+      "name": "同學的駕照影本"
+    }
+  ]
+}

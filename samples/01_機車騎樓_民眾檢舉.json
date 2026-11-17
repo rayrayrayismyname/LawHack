@@ -1,0 +1,36 @@
+{
+  "today": "115/11/17",
+  "applicant": {
+    "name": "王小明",
+    "phone": "0912-345-678",
+    "address": "示範市示範區示範路1號"
+  },
+  "ticket": {
+    "ticket_no": "XA0000001",
+    "plate": "ABC-1234",
+    "vehicle_type": "機車",
+    "violation_time": "115/11/02 09:30",
+    "violation_place": "示範市示範路一段100號前",
+    "violation_fact": "在人行道停車",
+    "article": "道路交通管理處罰條例第56條第1項第1款",
+    "fine": 600,
+    "source": "民眾檢舉",
+    "agency": "示範市政府警察局示範分局",
+    "punish_agency": "示範市交通事件裁決處",
+    "received_date": "115/11/10",
+    "due_date": "115/12/10"
+  },
+  "statement": "我把機車停在自己家店門口的騎樓，那裡不是人行道，也沒有擋到行人通行。後來收到民眾檢舉的罰單，打電話問分局說檢舉日期是11月12日。",
+  "facts": {
+    "report_date": "115/11/12"
+  },
+  "evidence": [
+    {
+      "name": "停車位置照片",
+      "description": "顯示機車停放於騎樓內"
+    },
+    {
+      "name": "罰單採證照片"
+    }
+  ]
+}

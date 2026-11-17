@@ -1,0 +1,8 @@
+# 把 example.com 換成你的網域；Caddy 會自動申請並更新 HTTPS 憑證
+{$DOMAIN:localhost} {
+	encode gzip
+	request_body {
+		max_size 25MB
+	}
+	reverse_proxy app:8000
+}

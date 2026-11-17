@@ -1,0 +1,28 @@
+{
+  "today": "115/11/17",
+  "ticket": {
+    "ticket_no": "XC0000003",
+    "plate": "CDE-2468",
+    "vehicle_type": "汽車",
+    "violation_time": "115/11/01 18:20",
+    "violation_place": "示範市中山路與民生路口",
+    "violation_fact": "不依標誌指示（禁止左轉）",
+    "article": "道路交通管理處罰條例第60條第2項第3款",
+    "fine": 900,
+    "source": "逕行舉發",
+    "agency": "示範市政府警察局示範分局",
+    "punish_agency": "示範市交通事件裁決處",
+    "received_date": "115/11/09",
+    "due_date": "115/12/09"
+  },
+  "statement": "那個路口的禁止左轉標誌被路樹擋住，我從遠處開過去完全看不到標誌，地上也沒有標線。我隔天回去拍照，標誌真的被樹枝遮住大半。",
+  "evidence": [
+    {
+      "name": "現場照片",
+      "description": "隔日拍攝，標誌遭樹枝遮蔽"
+    },
+    {
+      "name": "行車紀錄器截圖"
+    }
+  ]
+}

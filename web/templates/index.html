@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% set t = d.get('ticket') or {} %}
+{% set f = d.get('facts') or {} %}
+{% set a = d.get('applicant') or {} %}
+{% block body %}
+<div class="intro">
+  <div>
+    <h1>收到罰單，覺得有問題？</h1>
+    <p>輸入罰單、用自己的話說明經過、附上證據。系統會比對法規，產生可以直接遞交的陳述意見書，並告訴你期限和下一步。</p>
+  </div>
+  <div class="no-print">
+    <label for="sample-pick" class="small muted">先看示範案例</label>
+    <select id="sample-pick" onchange="if(this.value) location.href='/?sample='+encodeURIComponent(this.value)">
+      <option value="">選擇示範案例…</option>
+      {% for s in samples %}<option value="{{ s }}" {{ 'selected' if request.args.get('sample') == s }}>{{ s[3:]|replace('_', '：') }}</option>{% endfor %}
+    </select>
+  </div>
+</div>
+
+<div class="layout">
+<div>
+  <ol class="stepper js-only" id="stepper" aria-label="填寫進度">
+    <li data-go="1"><span class="n">1</span><span class="t">罰單資料</span></li>
+    <li data-go="2"><span class="n">2</span><span class="t">說明經過</span></li>
+    <li data-go="3"><span class="n">3</span><span class="t">確認事實</span></li>
+    <li data-go="4"><span class="n">4</span><span class="t">證據與送出</span></li>
+  </ol>
+
+  <form id="appeal-form" method="post" action="/analyze" novalidate>
+    <input type="hidden" name="facts_confirmed" id="facts_confirmed" value="0">
+    <input type="hidden" name="client_warnings" id="client_warnings" value="">
+
+    <!-- 步驟 1 -->
+    <section class="card step-panel current" data-step="1">
+      <h2>罰單資料</h2>
+      <p class="lead">拍罰單照片讓系統自動填寫，或直接手動輸入。有 <span class="req" style="color:var(--bad)">*</span> 的欄位會影響判斷，請盡量填寫。</p>
+
+      <label class="drop js-only" id="drop" for="ticket-image" {% if not ai_on %}aria-disabled="true"{% endif %}>
+        <img id="ticket-preview" alt="" hidden>
+        <span>
+          <span class="t" id="drop-title">{{ '上傳罰單照片，自動辨識欄位' if ai_on else '目前未啟用 AI，請手動輸入下方欄位' }}</span><br>
+          <span class="small muted" id="drop-note">{{ '支援 JPG、PNG。辨識結果會以淺藍底標示，請逐欄核對。' if ai_on else '管理者設定 LLM_PROVIDER 後即可使用拍照辨識。' }}</span>
+        </span>
+      </label>
+      <input type="file" id="ticket-image" accept="image/jpeg,image/png,image/webp" hidden {% if not ai_on %}disabled{% endif %}>
+
+      <div class="grid" style="margin-top:16px">
+        <div class="field"><label for="source">舉發方式 <span class="req">*</span></label>
+          <select id="source" name="source"><option value="">請選擇</option>
+            {% for s in sources %}<option {{ 'selected' if t.source == s }}>{{ s }}</option>{% endfor %}</select>
+          <div class="hint">罰單註記「民眾檢舉」請選民眾檢舉。</div></div>
+        <div class="field"><label for="article">違反法條 <span class="req">*</span></label>
+          <input type="text" id="article" name="article" value="{{ t.article or '' }}" placeholder="第56條第1項第1款">
+          <div class="check-result" id="article-check" hidden></div></div>
+        <div class="field"><label for="vehicle_type">車種 <span class="req">*</span></label>
+          <select id="vehicle_type" name="vehicle_type">{% for v in ['','汽車','機車','大型車'] %}
+            <option value="{{ v }}" {{ 'selected' if t.vehicle_type == v }}>{{ v or '請選擇' }}</option>{% endfor %}</select>
+          <div class="hint">自小客、自小貨選汽車；普重、輕機選機車。</div></div>
+        <div class="field"><label for="violation_time">違規時間 <span class="req">*</span></label>
+          <input type="text" id="violation_time" name="violation_time" value="{{ t.violation_time or '' }}" placeholder="115/11/02 09:30"></div>
+        <div class="field"><label for="violation_fact">違規事實</label>
+          <input type="text" id="violation_fact" name="violation_fact" value="{{ t.violation_fact or '' }}" placeholder="在人行道停車"></div>
+        <div class="field"><label for="violation_place">違規地點</label>
+          <input type="text" id="violation_place" name="violation_place" value="{{ t.violation_place or '' }}"></div>
+        <div class="field"><label for="received_date">收到通知單日期 <span class="req">*</span></label>
+          <input type="text" id="received_date" name="received_date" value="{{ t.received_date or '' }}" placeholder="115/11/10"></div>
+        <div class="field"><label for="due_date">應到案日期</label>
+          <input type="text" id="due_date" name="due_date" value="{{ t.due_date or '' }}" placeholder="115/12/10"></div>
+        <div class="field"><label for="fine">罰鍰（元）</label>
+          <input type="number" id="fine" name="fine" value="{{ t.fine or '' }}" min="0"></div>
+        <div class="field"><label for="points">記違規點數</label>
+          <input type="number" id="points" name="points" value="{{ t.points or '' }}" min="0"></div>
+        <div class="field"><label for="ticket_no">通知單號</label>
+          <input type="text" id="ticket_no" name="ticket_no" value="{{ t.ticket_no or '' }}"></div>
+        <div class="field"><label for="plate">車牌號碼</label>
+          <input type="text" id="plate" name="plate" value="{{ t.plate or '' }}"></div>
+        <div class="field"><label for="agency">舉發單位</label>
+          <input type="text" id="agency" name="agency" value="{{ t.agency or '' }}"></div>
+        <div class="field"><label for="punish_agency">處罰機關／應到案處所</label>
+          <input type="text" id="punish_agency" name="punish_agency" value="{{ t.punish_agency or '' }}"></div>
+      </div>
+      <div class="actions js-only"><span class="spacer"></span><button type="button" class="btn" data-next>下一步：說明經過</button></div>
+    </section>
+
+    <!-- 步驟 2 -->
+    <section class="card step-panel" data-step="2">
+      <h2>用你自己的話說明經過</h2>
+      <p class="lead">不用寫得像公文。寫下當時發生什麼事、你覺得罰單哪裡有問題，系統會幫你整理。</p>
+      <div class="field">
+        <label for="statement">事情經過</label>
+        <textarea id="statement" name="statement" placeholder="例如：我把機車停在自家店門口的騎樓，不是人行道，後來收到民眾檢舉的罰單。">{{ d.get('statement','') }}</textarea>
+      </div>
+      <div class="actions" style="margin-top:8px">
+        <button type="button" class="btn quiet sm mic js-only" id="mic" hidden>語音輸入</button>
+        <span class="small muted">常見情況，點一下加入：</span>
+      </div>
+      <div class="chips js-only">
+        <button type="button" class="chip" data-add="這張罰單是民眾檢舉開出的。">被民眾檢舉</button>
+        <button type="button" class="chip" data-add="採證照片裡的車牌和車型跟我的車不一樣。">照片不是我的車</button>
+        <button type="button" class="chip" data-add="採證照片很模糊，看不清楚車牌。">照片模糊</button>
+        <button type="button" class="chip" data-add="現場的標誌被遮住，開過去看不到。">標誌被擋住</button>
+        <button type="button" class="chip" data-add="這是超速罰單，測速照相前面沒有看到警示標誌。">測速前沒有警示</button>
+        <button type="button" class="chip" data-add="那天車子借給別人，不是我開的。">不是我駕駛</button>
+        <button type="button" class="chip" data-add="當時是為了讓救護車通過才這樣做。">讓救護車</button>
+      </div>
+      <div class="actions js-only">
+        <button type="button" class="btn quiet" data-prev>上一步</button><span class="spacer"></span>
+        <button type="button" class="btn" data-next>下一步：確認事實</button>
+      </div>
+    </section>
+
+    <!-- 步驟 3 -->
+    <section class="card step-panel" data-step="3">
+      <h2>系統理解到的事實</h2>
+      <p class="lead">系統依你的描述整理出下列事實，判斷申訴理由時會用到。<strong>請確認是否正確</strong>，不知道的可以留空。</p>
+      <div class="notice info js-only" id="facts-status" hidden></div>
+      <p class="small muted" id="facts-summary" hidden></p>
+
+      <div class="grid" style="margin-top:12px">
+        <div class="field" data-fact="location_type"><label for="location_type">違規地點類型</label>
+          <select id="location_type" name="location_type">{% for v in ['','人行道','行人穿越道','騎樓','路口','一般道路','停車格'] %}
+            <option value="{{ v }}" {{ 'selected' if f.location_type == v }}>{{ v or '不確定' }}</option>{% endfor %}</select></div>
+        <div class="field citizen-only" data-fact="report_date"><label for="report_date">民眾檢舉日期</label>
+          <input type="text" id="report_date" name="report_date" value="{{ f.report_date or '' }}" placeholder="可打電話向舉發單位詢問">
+          <div class="hint">只有民眾檢舉需要。超過違規日 7 天的檢舉不得舉發。</div></div>
+      </div>
+
+      <h3 style="font-size:15.5px;margin:18px 0 8px">以下情況符合的請打勾</h3>
+      <div class="toggles">
+        {% set flags = [
+          ('plate_mismatch','照片中的車不是我的車','車牌、車型或顏色和我的車不符'),
+          ('evidence_unclear','採證照片看不清楚','無法辨識車牌或違規行為'),
+          ('sign_obscured','標誌或標線被遮蔽、模糊','開過去時客觀上看不到規定'),
+          ('emergency','為了避免緊急危險','例如讓救護車、閃避突發狀況'),
+          ('not_driver','違規時不是我駕駛','車借給家人或朋友，要走「歸責」程序'),
+          ('is_speeding','這是超速罰單','會額外檢查測速警示標誌')] %}
+        {% for key, title, desc in flags %}
+        <label class="toggle" data-fact="{{ key }}">
+          <input type="checkbox" name="{{ key }}" value="yes" {{ 'checked' if f.get(key) }}>
+          <span><span>{{ title }}</span><br><span class="d">{{ desc }}</span></span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <div class="grid" id="speed-fields" style="margin-top:14px">
+        <div class="field" data-fact="road_type"><label for="road_type">道路類型</label>
+          <select id="road_type" name="road_type">{% for v in ['','一般道路','高速公路','快速公路'] %}
+            <option value="{{ v }}" {{ 'selected' if f.road_type == v }}>{{ v or '不確定' }}</option>{% endfor %}</select></div>
+        <div class="field" data-fact="sign_present"><label for="sign_present">測速點前有警示標誌嗎</label>
+          <select id="sign_present" name="sign_present"><option value="">不確定</option>
+            <option value="yes" {{ 'selected' if f.sign_present == true }}>有</option>
+            <option value="no" {{ 'selected' if f.sign_present == false }}>沒有</option></select></div>
+        <div class="field" data-fact="sign_distance_m"><label for="sign_distance_m">警示標誌距測速點（公尺）</label>
+          <input type="number" id="sign_distance_m" name="sign_distance_m" value="{{ f.sign_distance_m or '' }}" min="0">
+          <div class="hint">可用 Google 地圖「測量距離」。</div></div>
+      </div>
+
+      <details class="citizen-only" style="margin-top:14px" {{ 'open' if f.repeat_ticket_times }}>
+        <summary class="small">同一個檢舉人開了好幾張？（檢查重複舉發）</summary>
+        <div class="grid" style="margin-top:10px">
+          <div class="field" data-fact="repeat_ticket_times"><label for="repeat_ticket_times">其他同規定罰單的時間（一行一筆）</label>
+            <textarea id="repeat_ticket_times" name="repeat_ticket_times" style="min-height:60px">{{ (f.repeat_ticket_times or [])|join('\n') }}</textarea></div>
+          <div class="field" data-fact="crossed_intersection"><label for="crossed_intersection">兩次之間有經過路口嗎</label>
+            <select id="crossed_intersection" name="crossed_intersection"><option value="">不確定</option>
+              <option value="yes" {{ 'selected' if f.crossed_intersection == true }}>有</option>
+              <option value="no" {{ 'selected' if f.crossed_intersection == false }}>沒有</option></select></div>
+        </div>
+      </details>
+      <div class="actions js-only">
+        <button type="button" class="btn quiet" data-prev>上一步</button><span class="spacer"></span>
+        <button type="button" class="btn" data-next>下一步：證據與送出</button>
+      </div>
+    </section>
+
+    <!-- 步驟 4 -->
+    <section class="card step-panel" data-step="4">
+      <h2>證據與陳述人資料</h2>
+      <p class="lead">列出你手上的證據，會寫進陳述意見書的附件清單。檔案只用來讀取檔名，<strong>不會上傳到伺服器</strong>，遞交時請自行附上。</p>
+      <label class="btn ghost sm js-only" for="evidence-files" style="margin-bottom:10px">從手機或電腦選擇證據檔案</label>
+      <input type="file" id="evidence-files" multiple hidden>
+      <div id="ev-list" class="js-only"></div>
+      <button type="button" class="btn quiet sm js-only" id="ev-add">新增一項證據</button>
+      <textarea id="evidence_text" name="evidence_text" class="no-js-evidence" placeholder="每行一項，格式：名稱：說明">{% for e in d.get('evidence', []) %}{{ e.name }}{% if e.description %}：{{ e.description }}{% endif %}
+{% endfor %}</textarea>
+
+      <h3 style="font-size:15.5px;margin:22px 0 8px">陳述人資料（填入文件用，可留空之後手寫）</h3>
+      <div class="grid">
+        <div class="field"><label for="applicant_name">姓名</label><input type="text" id="applicant_name" name="applicant_name" value="{{ a.name or '' }}" autocomplete="name"></div>
+        <div class="field"><label for="applicant_phone">電話</label><input type="text" id="applicant_phone" name="applicant_phone" value="{{ a.phone or '' }}" autocomplete="tel"></div>
+        <div class="field"><label for="applicant_address">地址</label><input type="text" id="applicant_address" name="applicant_address" value="{{ a.address or '' }}" autocomplete="street-address"></div>
+      </div>
+      <div class="notice" id="missing" hidden style="margin-top:16px"></div>
+      <div class="actions">
+        <button type="button" class="btn quiet js-only" data-prev>上一步</button><span class="spacer"></span>
+        <button type="submit" class="btn" id="submit">產生申訴文件</button>
+      </div>
+    </section>
+  </form>
+</div>
+
+<aside class="side no-print">
+  <section class="card tool">
+    <h3>法條快速查詢</h3>
+    <p class="small muted" style="margin:0 0 10px">這個違規可以被民眾檢舉嗎？</p>
+    <div class="field"><label for="q-article">違反法條</label><input type="text" id="q-article" placeholder="56-1-1 或 第42條"></div>
+    <div class="field" style="margin-top:8px"><label for="q-vehicle">車種</label>
+      <select id="q-vehicle"><option value="">不指定</option><option>汽車</option><option>機車</option></select></div>
+    <button type="button" class="btn ghost sm" id="q-go" style="margin-top:10px">查詢</button>
+    <div class="check-result" id="q-result" hidden></div>
+    <p class="small muted" style="margin:8px 0 0">寫法：「53之1」代表第53條之1。</p>
+  </section>
+  <section class="card tool">
+    <h3>申訴前要知道</h3>
+    <ul>
+      <li>收到通知單後 <strong>30 天內</strong>要向處罰機關陳述意見。</li>
+      <li>車借別人開，要在<strong>應到案日期前</strong>辦理歸責，逾期仍罰車主。</li>
+      <li>期限內陳述不用錢；進行政訴訟裁判費 300 元，由敗訴方負擔。</li>
+      <li>沒有明確理由時，系統會建議直接繳納。</li>
+    </ul>
+  </section>
+  <section class="card tool js-only">
+    <h3>草稿</h3>
+    <p class="small muted" style="margin:0 0 8px" id="draft-state">填寫內容會自動存在這台裝置的瀏覽器裡。</p>
+    <button type="button" class="btn quiet sm" id="draft-clear">清除草稿</button>
+  </section>
+</aside>
+</div>
+<script id="initial" type="application/json">{{ {'ai': ai_on, 'sample': request.args.get('sample') or '', 'evidence': d.get('evidence', [])}|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='wizard.js') }}"></script>{% endblock %}

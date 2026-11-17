@@ -1,0 +1,60 @@
+{
+  "as_of": "2026-11-17",
+  "disclaimer": "以下為條文重點摘要，非逐字條文；正式內容以全國法規資料庫最新公告為準。",
+  "laws": {
+    "道交條例第7條之1": {
+      "law": "道路交通管理處罰條例",
+      "article": "7-1",
+      "summary": "民眾僅得就第1項表列之違規行為檢舉；行為終了日起逾七日之檢舉，不予舉發（第2項）；檢舉同一輛汽車二以上違反同一規定之行為，違規時間相隔未逾六分鐘且行駛未經過一個路口以上者，以舉發一次為限（第3項）。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=K0040012&FLNO=7-1"
+    },
+    "道交條例第7條之2": {
+      "law": "道路交通管理處罰條例",
+      "article": "7-2",
+      "summary": "以固定或非固定式科學儀器取締超速者，應於一般道路100公尺至300公尺間、高速公路及快速公路300公尺至1,000公尺間明顯標示警告。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=K0040012&FLNO=7-2"
+    },
+    "道交條例第9條": {
+      "law": "道路交通管理處罰條例",
+      "article": "9",
+      "summary": "受處罰人接獲通知單後，於30日內得逕依罰鍰基準繳納結案；不服舉發事實者，應於30日內向處罰機關陳述意見。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=K0040012&FLNO=9"
+    },
+    "道交條例第85條": {
+      "law": "道路交通管理處罰條例",
+      "article": "85",
+      "summary": "受處罰人認為違規行為應歸責他人者，應於通知單應到案日期前，檢附相關證據及應歸責人證明文件，向處罰機關告知應歸責人；逾期未辦理者，仍依各該條款處罰。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=K0040012&FLNO=85"
+    },
+    "道交條例第87條": {
+      "law": "道路交通管理處罰條例",
+      "article": "87",
+      "summary": "受處分人不服裁決者，應以原處分機關為被告，向管轄之行政法院（現為高等行政法院地方行政訴訟庭）提起訴訟；撤銷訴訟應於裁決書送達後30日之不變期間內提起。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=K0040012&FLNO=87"
+    },
+    "道交條例第4條": {
+      "law": "道路交通管理處罰條例",
+      "article": "4",
+      "summary": "道路標誌、標線、號誌之設置與管理，應提供駕駛人有關路況之警告、禁制、指示等資訊。標誌標線設置不明確或遭遮蔽時，駕駛人難以遵守。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=K0040012&FLNO=4"
+    },
+    "行政罰法第7條": {
+      "law": "行政罰法",
+      "article": "7",
+      "summary": "違反行政法上義務之行為非出於故意或過失者，不予處罰。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=A0030210&FLNO=7"
+    },
+    "行政罰法第13條": {
+      "law": "行政罰法",
+      "article": "13",
+      "summary": "因避免自己或他人生命、身體、自由、名譽或財產之緊急危難而出於不得已之行為，不予處罰；避難行為過當者，得減輕或免除處罰。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=A0030210&FLNO=13"
+    },
+    "行政程序法第36條": {
+      "law": "行政程序法",
+      "article": "36",
+      "summary": "行政機關應依職權調查證據，對當事人有利及不利事項一律注意。",
+      "url": "https://law.moj.gov.tw/LawClass/LawSingle.aspx?Pcode=A0030055&FLNO=36"
+    }
+  }
+}

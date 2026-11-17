@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}罰單申訴通{% endblock %}</title>
+<meta name="description" content="上傳罰單、說明經過、附上證據，產生可直接遞交的交通違規陳述意見書。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Noto+Serif+TC:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='app.css') }}">
+<script>document.documentElement.classList.add('js');</script>
+<style>.js .step-panel:not(.current) { display: none; } html:not(.js) .js-only { display: none !important; }</style>
+</head>
+<body>
+<header class="top">
+  <div class="inner">
+    <a class="brand" href="/">
+      <span class="mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l4 4v14H3V3h4"/><path d="M8 12l3 3 5-6"/></svg>
+      </span>
+      罰單申訴通
+    </a>
+    <span class="pill {{ 'on' if ai_on }}">{{ 'AI 已啟用' if ai_on else '示範模式（未啟用 AI）' }}</span>
+  </div>
+</header>
+<main class="page">{% block body %}{% endblock %}</main>
+<p class="foot">本系統依使用者提供的資料與法規知識庫產生文件，僅供參考，不構成法律意見；法規以全國法規資料庫最新公告為準。
+  分析結果會在 {{ config.OUTPUT_TTL_HOURS|int }} 小時後自動刪除。需要協助可洽處罰機關或法律扶助基金會（412-8518）。</p>
+{% block scripts %}{% endblock %}
+</body>
+</html>

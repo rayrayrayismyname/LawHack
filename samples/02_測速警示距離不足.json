@@ -1,0 +1,32 @@
+{
+  "today": "115/11/17",
+  "applicant": {
+    "name": "林美華",
+    "phone": "0922-000-111"
+  },
+  "ticket": {
+    "ticket_no": "XB0000002",
+    "plate": "BCD-5678",
+    "vehicle_type": "汽車",
+    "violation_time": "115/10/28 14:05",
+    "violation_place": "示範市環河路二段（往北）",
+    "violation_fact": "行車速度超過規定之最高速限12公里",
+    "article": "道路交通管理處罰條例第40條",
+    "fine": 1600,
+    "source": "科技執法",
+    "agency": "示範市政府警察局交通警察大隊",
+    "punish_agency": "示範市交通事件裁決處",
+    "received_date": "115/11/05",
+    "due_date": "115/12/05"
+  },
+  "statement": "收到超速罰單後我回到現場看，測速照相前面只有一個測速警示的牌子，用地圖量大概只有60公尺，開車根本來不及看到就被拍了。這條是一般市區道路。",
+  "evidence": [
+    {
+      "name": "警示標誌位置照片"
+    },
+    {
+      "name": "地圖測距截圖",
+      "description": "標誌至測速桿約60公尺"
+    }
+  ]
+}

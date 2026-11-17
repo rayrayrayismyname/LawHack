@@ -1,0 +1,21 @@
+{
+  "today": "115/11/17",
+  "ticket": {
+    "ticket_no": "XD0000004",
+    "plate": "DEF-1357",
+    "vehicle_type": "汽車",
+    "violation_time": "115/11/04 07:52",
+    "violation_place": "示範市中正路與和平路口",
+    "violation_fact": "闖紅燈",
+    "article": "道路交通管理處罰條例第53條第1項",
+    "fine": 2700,
+    "points": 3,
+    "source": "科技執法",
+    "agency": "示範市政府警察局交通警察大隊",
+    "punish_agency": "示範市交通事件裁決處",
+    "received_date": "115/11/12",
+    "due_date": "115/12/12"
+  },
+  "statement": "那天早上趕著上班，燈號變紅的時候我以為來得及就衝過去了，照片有拍到我的車。",
+  "evidence": []
+}

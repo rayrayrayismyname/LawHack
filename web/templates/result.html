@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+{% block title %}分析結果｜罰單申訴通{% endblock %}
+{% set A = r.assessment %}
+{% set L = r.letter %}
+{% set T = r.case.ticket %}
+{% set label = {STRONG:'明確法律瑕疵', MEDIUM:'可主張理由', PROCEDURE:'應辦理程序', INFO:'待補充資訊'} %}
+{% set dated = r.deadlines|selectattr('due')|list %}
+{% set nearest = (dated|sort(attribute='days_left')|first) if dated else None %}
+{% block body %}
+<p class="no-print" style="margin:0 0 12px"><a href="/">← 回到填寫頁</a>（草稿仍保留，可修改後重新分析）</p>
+
+<section class="card verdict-card">
+  <div class="verdict">
+    <div class="level {{ A.level }}" aria-label="評估等級 {{ A.level }}">{{ A.level }}</div>
+    <div>
+      <p class="small muted" style="margin:0">申訴可行性評估（僅供參考）</p>
+      <h1>{{ A.recommendation }}</h1>
+      <p class="small muted" style="margin:4px 0 0">
+        {{ T.violation_fact or '交通違規' }}{% if T.article %}｜{{ T.article }}{% endif %}{% if T.fine %}｜罰鍰 <span class="num">{{ '{:,}'.format(T.fine) }}</span> 元{% endif %}{% if T.points %}，記 {{ T.points }} 點{% endif %}
+      </p>
+    </div>
+    {% if nearest %}
+    <div class="count {{ 'urgent' if nearest.days_left is not none and nearest.days_left <= 7 }}">
+      <div class="small muted">{{ nearest.label }}</div>
+      <div class="big num">{{ nearest.days_left if nearest.days_left >= 0 else '已逾期' }}</div>
+      <div class="small muted">{{ '天' if nearest.days_left >= 0 else '' }}（{{ nearest.due }}）</div>
+    </div>
+    {% endif %}
+  </div>
+  {% if r.warnings %}<div class="notice" style="margin-top:14px">{% for w in r.warnings %}<div>{{ w }}</div>{% endfor %}</div>{% endif %}
+</section>
+
+<div class="layout" style="margin-top:16px">
+<div class="stack">
+
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline">
+      <h2>{{ '陳述意見書' if files.letter else '為什麼沒有產生陳述意見書' }}</h2>
+      {% if files.letter %}<span class="save-state no-print" id="save-state">可直接點文字修改</span>{% endif %}
+    </div>
+    {% if files.letter %}
+    <p class="lead no-print">事實經過可以自由修改；陳述理由由系統依法規產生，修改前請確認法條與事實相符。改完按「儲存修改」，下載的 Word 檔會同步更新。</p>
+    <div class="doc" id="doc">
+      <h3>交通違規陳述意見書</h3>
+      <table class="meta">
+        <tr><td>通知單號</td><td>{{ T.ticket_no }}</td><td>車牌號碼</td><td>{{ T.plate }}</td></tr>
+        <tr><td>違規時間</td><td>{{ T.violation_time }}</td><td>違規地點</td><td>{{ T.violation_place }}</td></tr>
+        <tr><td>違規事實</td><td colspan="3">{{ T.violation_fact }}</td></tr>
+        <tr><td>違反法條</td><td colspan="3">{{ T.article }}</td></tr>
+      </table>
+      <p><strong>主旨：</strong>{{ L.subject }}</p>
+      <div class="sec">說明：</div>
+      <div class="sec">一、事實經過</div>
+      <textarea id="l-facts" aria-label="事實經過">{{ L.facts }}</textarea>
+      <div class="sec">二、陳述理由</div>
+      {% for x in L.reasons %}<textarea class="l-reason" aria-label="陳述理由 {{ loop.index }}">{{ x }}</textarea>{% endfor %}
+      <div class="sec">三、檢附證據（一行一項）</div>
+      <textarea id="l-evidence" aria-label="檢附證據">{{ L.evidence|join('\n') }}</textarea>
+      <div class="sec">四、請求事項</div>
+      <textarea id="l-request" aria-label="請求事項">{{ L.request }}</textarea>
+      <p style="margin-top:16px">此致　{{ L.to }}</p>
+      <p class="sign">陳述人：＿＿＿＿＿＿（簽章）</p>
+    </div>
+    <div class="actions no-print">
+      <button type="button" class="btn" id="save">儲存修改</button>
+      <button type="button" class="btn quiet" id="copy">複製全文</button>
+      <button type="button" class="btn quiet" id="print">列印</button>
+    </div>
+    {% else %}
+    <p>{% if A.level == '低' %}系統沒有找到法律上站得住的申訴理由。沒有理由的申訴通常只會增加往返時間，所以系統沒有產生陳述意見書。{% endif %}
+       {% if files.attribution %}你的情況要走「歸責實際駕駛人」程序，請下載右側的申請書。{% endif %}</p>
+    <p class="muted small">如果你認為系統漏看了什麼，回到填寫頁補充經過或證據後重新分析。</p>
+    {% endif %}
+  </section>
+
+  <section class="card findings-card">
+    <h2>檢核結果與法令依據</h2>
+    <p class="lead">每一項都對照法規條文。綠色是明確的法律瑕疵，橘色是可以主張但需要證據支持。</p>
+    {% for f in r.findings %}
+      <div class="finding {{ f.strength }}">
+        <div class="h"><span class="tag {{ f.strength }}">{{ label[f.strength] }}</span>{{ f.title }}</div>
+        <div>{{ f.reason }}</div>
+        {% for k in f.law_refs %}<div class="law">依據：<a href="{{ laws[k].url }}" target="_blank" rel="noopener">{{ k }}</a>－{{ laws[k].summary }}</div>{% endfor %}
+        {% if f.needs %}<div class="law">建議補充：{{ f.needs|join('、') }}</div>{% endif %}
+      </div>
+    {% else %}<p>沒有找到可主張的理由。</p>{% endfor %}
+  </section>
+
+  <section class="card assess-card">
+    <h2>評估說明</h2>
+    <ul>{% for x in A.reasons %}<li>{{ x }}</li>{% endfor %}</ul>
+    <ul>{% for x in A.cost_note %}<li>{{ x }}</li>{% endfor %}</ul>
+    <p class="law">{{ A.base_rate_note }}</p>
+  </section>
+</div>
+
+<aside class="side no-print">
+  <section class="card tool">
+    <h3>下載文件</h3>
+    <div class="stack" style="gap:8px">
+      {% if files.letter %}<a class="btn" data-dl href="/download/{{ rid }}/letter">陳述意見書（Word）</a>{% endif %}
+      {% if files.attribution %}<a class="btn" href="/download/{{ rid }}/attribution">歸責實際駕駛人申請書（Word）</a>{% endif %}
+      <a class="btn ghost" href="/download/{{ rid }}/guide">申訴指引（Word）</a>
+    </div>
+  </section>
+
+  <section class="card tool">
+    <h3>下一步</h3>
+    <ul class="checklist" data-store="steps">
+      {% for s in r.steps %}<li><label><input type="checkbox"><span>{{ s }}</span></label></li>{% endfor %}
+    </ul>
+  </section>
+
+  <section class="card tool">
+    <h3>期限提醒</h3>
+    {% for dl in cal %}
+      <div class="deadline"><span>{{ dl.label }}<br><span class="small muted num">{{ dl.due }}（{{ '剩 %d 天'|format(dl.days_left) if dl.days_left >= 0 else '已逾期' }}）</span></span>
+        {% if dl.days_left >= 0 %}<a class="small" href="{{ dl.google }}" target="_blank" rel="noopener">加到 Google 日曆</a>{% endif %}</div>
+    {% else %}<p class="small muted">填寫收到通知單日期或應到案日期，就能計算期限。</p>{% endfor %}
+    {% if cal|selectattr('days_left', 'ge', 0)|list %}<a class="btn quiet sm" style="margin-top:10px" href="/download/{{ rid }}/ics">下載行事曆檔（提前 3 天提醒）</a>{% endif %}
+    <p class="small muted" style="margin:10px 0 0">不服裁決時，要在裁決書送達後 30 日內提起行政訴訟。</p>
+  </section>
+
+  <section class="card tool">
+    <h3>證據清單</h3>
+    <ul class="checklist" data-store="evidence">
+      {% for e in L.evidence %}<li><label><input type="checkbox"><span>{{ e }}</span></label></li>{% endfor %}
+      {% for f in r.findings if f.strength in [STRONG, MEDIUM, PROCEDURE] %}{% for n in f.needs %}
+        <li><label><input type="checkbox"><span>建議補充：{{ n }}</span></label></li>{% endfor %}{% endfor %}
+    </ul>
+  </section>
+</aside>
+</div>
+<script id="rid" type="application/json">{{ rid|tojson }}</script>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='result.js') }}"></script>{% endblock %}

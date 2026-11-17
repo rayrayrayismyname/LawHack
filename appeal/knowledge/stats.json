@@ -1,0 +1,26 @@
+{
+  "as_of": "2026-11-17",
+  "note": "作為「申訴可行性評估」的參考基準，非個案預測。",
+  "stats": [
+    {
+      "id": "taichung_108",
+      "label": "臺中市108年度交通違規申訴",
+      "appeal_rate": "申訴約2.4萬件，占舉發件數約1.1%",
+      "appeal_success": 0.20,
+      "litigation_success": 0.07,
+      "detail": "申訴結果免罰約20%、駁回約80%；提起行政訴訟者民眾勝訴約7%",
+      "source": "臺中市交通事件裁決處〈民眾交通違規申訴案件態樣分析及減量策進作為〉",
+      "url": "https://www.traffic.taichung.gov.tw/df_ufiles/f/專案報告一-民眾交通違規申訴案件態樣分析及減量策進作為_(1090324).pdf"
+    },
+    {
+      "id": "taipei_tech_113",
+      "label": "臺北市113年科技執法罰單申訴",
+      "appeal_success": 0.108,
+      "detail": "申訴2,048件，經審查撤銷222件（約10.8%）",
+      "source": "聯合新聞網，2025年3月",
+      "url": "https://today.line.me/tw/v2/amp/article/vX96zr0"
+    }
+  ],
+  "court_fee_first_instance": 300,
+  "court_fee_appeal": 750
+}
